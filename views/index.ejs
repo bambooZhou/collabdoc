@@ -1,11 +1,131 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Online Compiler</title>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.1.0/bootstrap-modal.min.css" rel="stylesheet" media="screen">
+    <link href="/stylesheets/style.css" rel="stylesheet" media="screen">
+    <link href="/stylesheets/pygment.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/javascripts/app.js"></script>
+    <script type="text/javascript" src="/javascripts/chat.js"></script>
+    <script type="text/javascript" src="/javascripts/chat_ui.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-modal/2.1.0/bootstrap-modal.pack.min.js"></script>
   </head>
+
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <div class="container">
+
+    <div class="navbar navbar-fixed-top">
+	 <div class="navbar-inner">
+	  <div class="container">
+	    <p class="brand">CollabDoc</p>
+	  </div>
+	 </div>
+    </div>
+      <div class="markdown-area">
+	<form id="form" class="markdown-form" action="" method="post">
+	  <!--<input id="title"/>-->
+	  <!--<div class="repo-nav">
+            <ul class="repo-nav-actions clearfix">
+              <li><a title="Head1 Ctrl+Alt+1" id="hd1" role="button">H1</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Head2 Ctrl+Alt+2" id="hd2" role="button">H2</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Head3 Ctrl+Alt+3" id="hd3" role="button">H3</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Bold Ctrl+Alt+4" id="Bol" role="button">B</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Italic Ctrl+Alt+5" id="Ita" role="button">I</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Code Ctrl+Alt+6" id="Cod" role="button">C</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Unordered List Ctrl+Alt+7" id="Uolist" role="button">UL</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Ordered List Ctrl+Alt+8" id="Olist" role="button">OL</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Blockquote Ctrl+Alt+9" id="Blo" role="button">BQ</a></li>
+	      <li class="divider"></li>
+	      <li><a title="Horizontal Rule Ctrl+Alt+0" id="Hor" role="button">HR</a></li>
+	      <li class="divider"></li>
+	      <li><a id="Pic-cli" title="Picture Ctrl+Alt+-" href="#Image" role="button" data-toggle="modal">P</a></li>
+	      <li class="divider"></li>
+	      <li><a id="Lin-cli Ctrl+Alt+=" title="Link" href="#Link" role="button" data-toggle="modal">L</a></li>
+	      <li class="divider"></li>
+	      <li><a id="Clean" title="Clean Ctrl+Alt+\" role="button">CL</li>
+            </ul>
+	  </div>-->
+	  <textarea id="content"></textarea>
+      </form>
+      <!--<a id="upload" class="btn btn-primary mkfooter" href="#Upload" data-toggle="modal">UPLOAD</a>
+      <a id="download" class="btn btn-primary mkfooter">DOWNLOAD</a>-->
+      </div>
+
+      <div class="markdownout-panel">
+	<div class="markdownout-area">
+	  <div id="dictionary">
+	  </div>
+	</div>
+      </div>
+
+      <div id="Image" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+	  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	  <h3>Insert Image</h3>
+	</div>
+	<div class="modal-body">
+	  <div class="modal-bodyin">
+	    <h4>Image TEXT</h4>
+	    <input id="imagetext" type="text" class="modalinput" />
+	    <h4>Image URL</h4>
+	    <input id="imageurl" type="text" class="modalinput" />
+	  </div>
+	</div>
+	<div class="modal-footer">
+	  <button class="btn" aria-hidden="true" data-dismiss="modal" >Close</button>
+	  <button class="btn btn-primary datadis" onclick="insert_link('image')">OK</button>
+	</div>
+      </div>
+
+      <div id="Link" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+	  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	  <h3>Insert Link</h3>
+	</div>
+	<div class="modal-body">
+	  <div class="modal-bodyin">
+	    <h4>Link Text</h4>
+	    <input id="linktext" type="text" class="modalinput" />
+	    <h4>Link URL</h4>
+	    <input id="linkurl" type="text" class="modalinput" />
+	  </div>
+	</div>
+	<div class="modal-footer">
+	  <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  <button class="btn btn-primary datadis" onclick="insert_link('link')">OK</button>
+	</div>
+      </div>
+
+      <div id="Upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+	  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	  <h3>Upload file</h3>
+	</div>
+	<div class="modal-body">
+	  <div class="modal-bodyin">
+	    <div>
+	      <form id="uploadform" enctype="multipart/form-data">
+		<input type="file" id="uploadfile" name="file" />
+		<a id="uploadok" class="btn">OK</a>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
   </body>
 </html>
+
